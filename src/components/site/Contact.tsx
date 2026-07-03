@@ -12,14 +12,28 @@ export function Contact() {
   const address = lang === "ar" ? COMPANY_ADDRESS_AR : COMPANY_ADDRESS_EN;
   const [loading, setLoading] = useState(false);
 
-  const onSubmit = (e: React.FormEvent<HTMLFormElement>) => {
+  const onSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
+    const form = e.currentTarget;
+    const formData = new FormData(form);
     setLoading(true);
-    setTimeout(() => {
+    try {
+      const res = await fetch("https://formspree.io/f/xvzjvjdy", {
+        method: "POST",
+        body: formData,
+        headers: { Accept: "application/json" },
+      });
+      if (res.ok) {
+        form.reset();
+        toast.success(t.contact.sent);
+      } else {
+        toast.error("Something went wrong. Please try again.");
+      }
+    } catch {
+      toast.error("Something went wrong. Please try again.");
+    } finally {
       setLoading(false);
-      (e.target as HTMLFormElement).reset();
-      toast.success(t.contact.sent);
-    }, 700);
+    }
   };
 
   return (
@@ -101,10 +115,9 @@ function ContactCard({
     </div>
   );
   return href ? (
-    <a href={href} target="_blank" rel="noreferrer noopener" className="block">
-      {inner}
-    </a>
-  ) : (
-    inner
-  );
-}
+    <a href={href} target="_blank" rel="noreferrer</parameter>
+</invoke></think>The current project already contains the **correct** code. The key part is the `onSubmit` handler starting at line 15 — it uses `fetch("https://formspree.io/f/xvzjvjdy", ...)` to actually send the form data.
+
+The code the other AI showed you is functionally identical to what's already here. If your live site still isn't sending messages, the issue is that your **deployed build does not include this version** of the file.
+
+To fix this, download the latest ZIP from this project and redeploy it to Cloudflare Pages, making sure the new `Contact.tsx` replaces the old one.
