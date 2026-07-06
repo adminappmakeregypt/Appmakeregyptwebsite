@@ -1,144 +1,143 @@
-// src/components/site/Contact.tsx
 import { useState } from "react";
-import { useForm } from "react-hook-form";
-import { zodResolver } from "@hookform/resolvers/zod";
-import { z } from "zod";
-import { toast } from "sonner";
+import { Mail, MapPin, MessageCircle, Send, Facebook } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
-import {
-  Form,
-  FormControl,
-  FormField,
-  FormItem,
-  FormLabel,
-  FormMessage,
-} from "@/components/ui/form";
-import { useI18n } from "@/i18n";
+import { useI18n, WHATSAPP_NUMBER, WHATSAPP_DISPLAY, CONTACT_EMAIL, FACEBOOK_URL, COMPANY_ADDRESS_EN, COMPANY_ADDRESS_AR } from "@/lib/i18n";
+import { SectionHeader } from "./Services";
+import { toast } from "sonner";
 
 const WEB3FORMS_ACCESS_KEY = "a600c2b9-0c16-4896-840d-3ca41cf49170";
 
-const schema = z.object({
-  name: z.string().min(2),
-  email: z.string().email(),
-  phone: z.string().min(6),
-  message: z.string().min(5),
-  botcheck: z.string().optional(), // honeypot
-});
-
-type FormValues = z.infer<typeof schema>;
-
-export default function Contact() {
-  const { t } = useI18n();
+export function Contact() {
+  const { t, lang } = useI18n();
+  const address = lang === "ar" ? COMPANY_ADDRESS_AR : COMPANY_ADDRESS_EN;
   const [loading, setLoading] = useState(false);
 
-  const form = useForm<FormValues>({
-    resolver: zodResolver(schema),
-    defaultValues: { name: "", email: "", phone: "", message: "", botcheck: "" },
-  });
+  const onSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
+    e.preventDefault();
+    const form = e.currentTarget;
+    const fd = new FormData(form);
 
-  async function onSubmit(values: FormValues) {
-    // Spam protection: if honeypot is filled, silently drop
-    if (values.botcheck) return;
+    // honeypot
+    if ((fd.get("botcheck") as string)?.length) return;
+
+    fd.append("access_key", WEB3FORMS_ACCESS_KEY);
+    fd.append("subject", "New enquiry from AppMaker Egypt website");
+    fd.append("from_name", "AppMaker Egypt Website");
 
     setLoading(true);
     try {
       const res = await fetch("https://api.web3forms.com/submit", {
         method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-          Accept: "application/json",
-        },
-        body: JSON.stringify({
-          access_key: WEB3FORMS_ACCESS_KEY,
-          subject: "New enquiry from AppMaker Egypt website",
-          from_name: "AppMaker Egypt Website",
-          name: values.name,
-          email: values.email,
-          phone: values.phone,
-          message: values.message,
-          botcheck: "",
-        }),
+        body: fd,
       });
-
-      const data = await res.json();
-
+      const data = await res.json().catch(() => ({}));
       if (res.ok && data.success) {
-        toast.success(t.contact.sent ?? "Message sent successfully!");
         form.reset();
+        toast.success(t.contact.sent);
       } else {
-        toast.error(data.message ?? "Failed to send. Please try again.");
+        toast.error(data.message || "Failed to send. Please try again.");
       }
-    } catch (err) {
-      toast.error("Network error. Please check your connection and try again.");
+    } catch {
+      toast.error("Network error. Please try again.");
     } finally {
       setLoading(false);
     }
-  }
+  };
 
   return (
-    <Form {...form}>
-      <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
-        {/* Honeypot — hidden from real users */}
-        <input
-          type="checkbox"
-          name="botcheck"
-          tabIndex={-1}
-          autoComplete="off"
-          style={{ display: "none" }}
-          {...form.register("botcheck")}
-        />
+    <section id="contact" className="py-20 sm:py-28">
+      <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
+        <SectionHeader eyebrow="07" title={t.contact.title} subtitle={t.contact.subtitle} />
 
-        <FormField
-          control={form.control}
-          name="name"
-          render={({ field }) => (
-            <FormItem>
-              <FormLabel>{t.contact.name}</FormLabel>
-              <FormControl><Input {...field} /></FormControl>
-              <FormMessage />
-            </FormItem>
-          )}
-        />
-        <FormField
-          control={form.control}
-          name="email"
-          render={({ field }) => (
-            <FormItem>
-              <FormLabel>{t.contact.email}</FormLabel>
-              <FormControl><Input type="email" {...field} /></FormControl>
-              <FormMessage />
-            </FormItem>
-          )}
-        />
-        <FormField
-          control={form.control}
-          name="phone"
-          render={({ field }) => (
-            <FormItem>
-              <FormLabel>{t.contact.phone}</FormLabel>
-              <FormControl><Input type="tel" {...field} /></FormControl>
-              <FormMessage />
-            </FormItem>
-          )}
-        />
-        <FormField
-          control={form.control}
-          name="message"
-          render={({ field }) => (
-            <FormItem>
-              <FormLabel>{t.contact.message}</FormLabel>
-              <FormControl><Textarea rows={5} {...field} /></FormControl>
-              <FormMessage />
-            </FormItem>
-          )}
-        />
+        <div className="mt-14 grid grid-cols-1 gap-8 lg:grid-cols-5">
+          <form
+            onSubmit={onSubmit}
+            className="rounded-3xl border border-border/60 bg-card p-6 shadow-card sm:p-8 lg:col-span-3"
+          >
+            {/* honeypot */}
+            <input
+              type="checkbox"
+              name="botcheck"
+              tabIndex={-1}
+              autoComplete="off"
+              style={{ display: "none" }}
+            />
 
-        <Button type="submit" disabled={loading} className="w-full">
-          {loading ? (t.contact.sending ?? "Sending...") : (t.contact.send ?? "Send")}
-        </Button>
-      </form>
-    </Form>
+            <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
+              <Input required name="name" placeholder={t.contact.name} />
+              <Input required type="email" name="email" placeholder={t.contact.email} />
+            </div>
+            <Input className="mt-4" name="phone" placeholder={t.contact.phone} />
+            <Textarea required rows={5} className="mt-4" name="message" placeholder={t.contact.message} />
+            <Button type="submit" size="lg" className="mt-5 w-full shadow-elegant" disabled={loading}>
+              <Send className="me-2 h-4 w-4" />
+              {loading ? "..." : t.contact.send}
+            </Button>
+          </form>
+
+          <div className="space-y-4 lg:col-span-2">
+            <ContactCard
+              icon={<MessageCircle className="h-5 w-5" />}
+              title={t.contact.whatsapp_us}
+              value={WHATSAPP_DISPLAY}
+              href={`https://wa.me/${WHATSAPP_NUMBER}`}
+            />
+            <ContactCard
+              icon={<Mail className="h-5 w-5" />}
+              title={t.contact.email_us}
+              value={CONTACT_EMAIL}
+              href={`mailto:${CONTACT_EMAIL}`}
+            />
+            <ContactCard
+              icon={<Facebook className="h-5 w-5" />}
+              title={t.contact.facebook}
+              value="AppMaker Egypt"
+              href={FACEBOOK_URL}
+            />
+            <ContactCard
+              icon={<MapPin className="h-5 w-5" />}
+              title={t.contact.location}
+              value={address}
+            />
+            <div className="overflow-hidden rounded-2xl border border-border/60">
+              <iframe
+                title="AppMaker Egypt location"
+                src="https://www.google.com/maps?q=Smart+Village+B215+F7+Phase+1+Cairo+Alexandria+Desert+Road&output=embed"
+                width="100%"
+                height="220"
+                loading="lazy"
+                referrerPolicy="no-referrer-when-downgrade"
+                className="block w-full"
+              />
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+  );
+}
+
+function ContactCard({
+  icon, title, value, href,
+}: { icon: React.ReactNode; title: string; value: string; href?: string }) {
+  const inner = (
+    <div className="flex items-center gap-4 rounded-2xl border border-border/60 bg-card p-4 transition-all hover:-translate-y-0.5 hover:shadow-card">
+      <div className="grid h-11 w-11 shrink-0 place-items-center rounded-xl bg-primary/10 text-primary">
+        {icon}
+      </div>
+      <div className="min-w-0">
+        <div className="text-xs font-medium text-muted-foreground">{title}</div>
+        <div className="truncate text-sm font-semibold">{value}</div>
+      </div>
+    </div>
+  );
+  return href ? (
+    <a href={href} target="_blank" rel="noreferrer noopener" className="block">
+      {inner}
+    </a>
+  ) : (
+    inner
   );
 }
