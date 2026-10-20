@@ -1,1 +1,0 @@
-Keep this deliverable dependency-free: index.html contains initial English content, app.js owns shared translations and interactions, and styles.css owns visual tokens. This allows direct GitHub Pages hosting without a build step.
