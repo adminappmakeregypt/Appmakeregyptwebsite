@@ -1,0 +1,133 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Manage Promotions — AppMaker Egypt Admin</title>
+<meta name="robots" content="noindex,nofollow">
+<link rel="icon" href="favicon.png" type="image/png">
+<link rel="stylesheet" href="styles.css">
+<style>
+.admin-wrap{max-width:1000px;margin:0 auto;padding:110px 20px 60px}
+.admin-head{display:flex;align-items:center;justify-content:space-between;gap:12px;flex-wrap:wrap;margin-bottom:20px}
+.admin-head h1{margin:0;font-size:1.5rem}
+.login-card{max-width:420px;margin:80px auto;padding:28px}
+.login-card h1{font-size:1.3rem;margin-top:0}
+.field{display:block;margin-bottom:14px}
+.field span{display:block;font-size:.85rem;font-weight:600;margin-bottom:4px}
+.field input,.field textarea,.field select{width:100%;box-sizing:border-box;padding:10px;border-radius:10px;border:1px solid var(--line,#d7dce4);background:var(--bg,#fff);color:inherit;font:inherit}
+.field textarea{min-height:110px}
+.msg{margin:10px 0;font-size:.9rem;min-height:1.2em}
+.msg.error{color:#c0392b}
+.msg.ok{color:#1e8449}
+.promo-row{display:flex;align-items:center;gap:14px;padding:12px;border:1px solid var(--line,#d7dce4);border-radius:14px;margin-bottom:10px;flex-wrap:wrap}
+.promo-row img{width:110px;height:66px;object-fit:cover;border-radius:8px;flex-shrink:0}
+.promo-row .info{flex:1;min-width:180px}
+.promo-row .info h3{margin:0 0 2px;font-size:1rem}
+.promo-row .meta{font-size:.78rem;color:var(--muted,#5b6472)}
+.badge-status{display:inline-block;padding:2px 10px;border-radius:999px;font-size:.72rem;font-weight:700;text-transform:uppercase}
+.st-published{background:#e6f7ed;color:#1e8449}
+.st-draft{background:#fdf3e0;color:#b9770e}
+.st-unpublished{background:#f2e5e5;color:#c0392b}
+.row-actions{display:flex;gap:6px;flex-wrap:wrap}
+.row-actions button,.row-actions .button{padding:6px 12px;font-size:.82rem}
+button.quiet-link{background:none;border:none;color:var(--muted,#5b6472);cursor:pointer;font:inherit;text-decoration:underline}
+#editor{border:1px solid var(--line,#d7dce4);border-radius:16px;padding:22px;margin:22px 0}
+#editor h2{margin-top:0;font-size:1.15rem}
+.editor-grid{display:grid;grid-template-columns:1fr 1fr;gap:0 18px}
+.editor-grid .full{grid-column:1/-1}
+.editor-actions{display:flex;gap:10px;flex-wrap:wrap;margin-top:6px}
+#preview-modal{position:fixed;inset:0;background:rgba(0,0,0,.55);display:flex;align-items:center;justify-content:center;z-index:200;padding:20px}
+#preview-modal .dialog{background:var(--bg,#fff);color:inherit;border-radius:16px;max-width:420px;width:100%;max-height:90vh;overflow:auto;padding:18px}
+#preview-modal .promo-card{border:1px solid var(--line,#d7dce4)}
+.current-img{width:100%;max-width:260px;border-radius:10px;display:block;margin-bottom:8px}
+@media(max-width:640px){.editor-grid{grid-template-columns:1fr}.promo-row img{width:80px;height:48px}}
+</style>
+</head>
+<body>
+<header id="header"><nav class="container nav"><a href="index.html" class="logo"><img class="logo-mark" src="assets/logo.png" alt="AppMaker Egypt" width="180" height="70"></a><div class="nav-tools"><a href="subscription-requests.html" class="button outline" style="font-size:.85rem">Subscription Requests</a> <a href="subscription-activation.html" class="button outline" style="font-size:.85rem">Subscription Activation</a> <a href="index.html" class="button outline" style="font-size:.85rem">← Back to website</a></div></nav></header>
+<div class="admin-wrap">
+
+  <!-- ============ Login ============ -->
+  <div id="login-view" class="card login-card" hidden>
+    <h1>Manage Promotions</h1>
+    <p style="color:var(--muted,#5b6472);font-size:.9rem">Authorized administrator only. Sign in with your administrator account.</p>
+    <form id="login-form">
+      <label class="field"><span>Email</span><input type="email" id="login-email" required autocomplete="username"></label>
+      <label class="field"><span>Password</span><input type="password" id="login-password" required autocomplete="current-password"></label>
+      <button class="button" type="submit" style="width:100%">Sign in</button>
+      <p id="login-msg" class="msg error" role="alert"></p>
+    </form>
+  </div>
+
+  <!-- ============ Admin ============ -->
+  <div id="admin-view" hidden>
+    <div class="admin-head">
+      <h1>Manage Promotions</h1>
+      <div>
+        <button id="add-btn" class="button" type="button">+ Add Promotion</button>
+        <button id="signout-btn" class="quiet-link" type="button">Sign out</button>
+      </div>
+    </div>
+    <p id="admin-msg" class="msg" role="status"></p>
+
+    <div id="editor" hidden>
+      <h2 id="editor-title">Add Promotion</h2>
+      <form id="editor-form">
+        <div class="editor-grid">
+          <label class="field full"><span>Promotion Title *</span><input id="f-title" required maxlength="200" dir="auto"></label>
+
+          <label class="field full"><span>Promotion Photo * (JPG, PNG or WebP — max 5 MB)</span>
+            <img id="f-current-img" class="current-img" hidden alt="">
+            <input type="file" id="f-image" accept="image/jpeg,image/png,image/webp">
+          </label>
+
+          <label class="field full"><span>Promotion Text * (Arabic and English supported)</span><textarea id="f-description" required maxlength="5000" dir="auto"></textarea></label>
+
+          <label class="field full"><span>Payment Link * (https://…)</span><input id="f-payment" type="url" required maxlength="2000" dir="ltr" placeholder="https://"></label>
+
+          <label class="field"><span>Price / Offer Details (shown to customers, optional)</span><input id="f-price" maxlength="300" dir="auto" placeholder="مثال: 1500 جنيه / سنة"></label>
+          <label class="field"><span>Subscription Duration in months (optional)</span><input id="f-duration" type="number" min="0" max="120" step="1" placeholder="12"></label>
+
+          <label class="field"><span>Button Text *</span><input id="f-button" required maxlength="80" dir="auto" placeholder="اشترك الآن / Subscribe Now"></label>
+
+          <label class="field"><span>Status</span>
+            <select id="f-status">
+              <option value="draft">Draft</option>
+              <option value="published">Published</option>
+              <option value="unpublished">Unpublished</option>
+            </select>
+          </label>
+
+          <label class="field"><span>Display Order (lower shows first)</span><input id="f-order" type="number" value="1" step="1"></label>
+
+          <label class="field"><span>Start Date (optional)</span><input id="f-start" type="datetime-local"></label>
+          <label class="field"><span>End Date (optional)</span><input id="f-end" type="datetime-local"></label>
+        </div>
+        <div class="editor-actions">
+          <button type="button" id="preview-btn" class="button outline">Preview</button>
+          <button type="submit" id="save-draft-btn" class="button outline" data-status="draft">Save Draft</button>
+          <button type="submit" id="publish-btn" class="button" data-status="published">Publish</button>
+          <button type="button" id="cancel-btn" class="quiet-link">Cancel</button>
+        </div>
+        <p id="editor-msg" class="msg error" role="alert"></p>
+      </form>
+    </div>
+
+    <div id="promo-list"></div>
+    <p id="empty-msg" style="color:var(--muted,#5b6472)" hidden>No promotions yet. Click “Add Promotion” to create your first offer.</p>
+  </div>
+</div>
+
+<!-- ============ Preview modal ============ -->
+<div id="preview-modal" hidden>
+  <div class="dialog">
+    <h2 style="margin-top:0;font-size:1.05rem">Preview — this is how visitors will see it</h2>
+    <div id="preview-body"></div>
+    <button id="preview-close" class="button outline" type="button" style="margin-top:14px">Close</button>
+  </div>
+</div>
+
+<script type="module" src="promotions-admin.js"></script>
+</body>
+</html>
