@@ -1,0 +1,107 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>طلب الاشتراك — AppMaker Egypt</title>
+<meta name="description" content="أكمل بيانات عيادتك وموقعك الإلكتروني قبل الدفع للاشتراك في Clinic Management من AppMaker Egypt.">
+<meta name="robots" content="noindex">
+<link rel="icon" href="favicon.png" type="image/png">
+<link rel="stylesheet" href="styles.css">
+<link rel="stylesheet" href="subscription.css">
+</head>
+<body>
+<header id="header"><nav class="container nav"><a href="index.html" class="logo"><img class="logo-mark" src="assets/logo.png" alt="AppMaker Egypt" width="180" height="70"></a><div class="nav-tools"><a href="index.html" class="button outline" style="font-size:.85rem">← الرجوع للموقع</a></div></nav></header>
+
+<div class="sub-wrap">
+  <h1>طلب الاشتراك</h1>
+  <p class="sub-lead">من فضلك أكمل البيانات التالية. بعد حفظ الطلب سيتم تحويلك إلى صفحة الدفع الخاصة بالعرض.</p>
+
+  <p id="promo-loading" class="sub-muted">جارٍ تحميل العرض…</p>
+  <div id="promo-missing" class="card sub-box" hidden>
+    <p>هذا العرض غير متاح حاليًا. من فضلك ارجع إلى الصفحة الرئيسية واختر عرضًا من العروض الحالية.</p>
+    <a class="button" href="index.html#promotions">العروض الحالية</a>
+  </div>
+
+  <!-- Selected promotion (read-only — customers cannot change price or duration) -->
+  <div id="promo-box" class="card sub-box sub-promo" hidden>
+    <span class="sub-tag">العرض المختار</span>
+    <h2 id="promo-title" dir="auto"></h2>
+    <p id="promo-desc" dir="auto"></p>
+    <p id="promo-price" class="sub-price" dir="auto" hidden></p>
+    <p id="promo-duration" class="sub-muted" hidden></p>
+  </div>
+
+  <form id="sub-form" novalidate hidden>
+    <!-- honeypot (bots fill it, people never see it) -->
+    <input type="text" id="hp-website" name="website" tabindex="-1" autocomplete="off" class="sub-hp" aria-hidden="true">
+
+    <fieldset class="card sub-box">
+      <legend>أ. بيانات الطبيب والعيادة</legend>
+      <div class="sub-grid">
+        <label class="field"><span>اسم الطبيب بالكامل *</span><input id="d-name" required maxlength="120" dir="auto"></label>
+        <label class="field"><span>التخصص *</span>
+          <select id="d-specialty" required>
+            <option value="">— اختر التخصص —</option>
+            <option value="general">🩺 طب عام</option>
+            <option value="dental">🦷 أسنان</option>
+            <option value="ophthalmology">👁️ رمد وعيون</option>
+            <option value="pediatrics">🧒 أطفال</option>
+            <option value="dermatology">🧴 جلدية</option>
+            <option value="orthopedics">🦴 عظام</option>
+          </select>
+        </label>
+        <label class="field"><span>اسم العيادة *</span><input id="d-clinic" required maxlength="160" dir="auto"></label>
+        <label class="field"><span>رقم الموبايل *</span><input id="d-mobile" type="tel" required maxlength="25" dir="ltr" inputmode="tel" placeholder="01xxxxxxxxx"></label>
+        <label class="field"><span>رقم الواتساب</span><input id="d-whatsapp" type="tel" maxlength="25" dir="ltr" inputmode="tel"></label>
+        <label class="field"><span>البريد الإلكتروني *</span><input id="d-email" type="email" required maxlength="160" dir="ltr"></label>
+        <label class="field"><span>المدينة</span><input id="d-city" maxlength="80" dir="auto"></label>
+        <label class="field"><span>عنوان العيادة</span><input id="d-address" maxlength="300" dir="auto"></label>
+      </div>
+    </fieldset>
+
+    <fieldset class="card sub-box">
+      <legend>ب. بيانات موقع الطبيب</legend>
+      <p class="sub-muted">كل الحقول هنا اختيارية — يمكن استكمالها لاحقًا.</p>
+      <div class="sub-grid">
+        <label class="field full"><span>نبذة عن الطبيب</span><textarea id="w-bio" maxlength="3000" dir="auto"></textarea></label>
+        <label class="field full"><span>المؤهلات والخبرات</span><textarea id="w-qual" maxlength="3000" dir="auto"></textarea></label>
+        <label class="field full"><span>الخدمات المقدمة</span><textarea id="w-services" maxlength="3000" dir="auto"></textarea></label>
+        <label class="field"><span>أيام وساعات العمل</span><input id="w-hours" maxlength="1000" dir="auto" placeholder="مثال: السبت–الخميس 5م–10م"></label>
+        <label class="field"><span>مدة الكشف</span><input id="w-duration" maxlength="60" dir="auto" placeholder="مثال: 20 دقيقة"></label>
+        <label class="field"><span>صورة الطبيب (JPG/PNG/WebP — حتى 2 ميجا)</span><input id="w-photo" type="file" accept="image/jpeg,image/png,image/webp"></label>
+        <label class="field"><span>لوجو العيادة (JPG/PNG/WebP — حتى 2 ميجا)</span><input id="w-logo" type="file" accept="image/jpeg,image/png,image/webp"></label>
+        <label class="field full"><span>معلومات إضافية أو متطلبات خاصة للموقع</span><textarea id="w-extra" maxlength="3000" dir="auto"></textarea></label>
+      </div>
+    </fieldset>
+
+    <fieldset class="card sub-box">
+      <legend>ج. إعداد نظام إدارة العيادة</legend>
+      <div class="sub-grid">
+        <label class="field"><span>عدد الأطباء في العيادة</span><input id="s-doctors" type="number" min="1" max="999" inputmode="numeric"></label>
+        <label class="field"><span>عدد حسابات الموظفين المطلوبة</span><input id="s-staff" type="number" min="0" max="999" inputmode="numeric"></label>
+        <label class="field full"><span>أسماء وتخصصات الأطباء الإضافيين (إن وجد)</span><textarea id="s-additional" maxlength="2000" dir="auto"></textarea></label>
+        <label class="field full"><span>أدوار الموظفين المطلوبة</span><input id="s-roles" maxlength="1000" dir="auto" placeholder="مثال: استقبال، مساعد طبيب"></label>
+        <label class="field full"><span>متطلبات إعداد إضافية</span><textarea id="s-extra" maxlength="3000" dir="auto"></textarea></label>
+      </div>
+    </fieldset>
+
+    <label class="sub-consent"><input type="checkbox" id="consent" required> <span>أوافق على استخدام البيانات المرسلة لتجهيز حساب العيادة وموقع الطبيب الإلكتروني. *</span></label>
+
+    <p id="form-msg" class="msg error" role="alert"></p>
+    <button id="submit-btn" class="button sub-submit" type="submit">حفظ البيانات والمتابعة للدفع</button>
+  </form>
+
+  <!-- Shown after the request is saved -->
+  <div id="done-box" class="card sub-box sub-done" hidden>
+    <h2>✓ تم استلام طلب الاشتراك</h2>
+    <p id="done-msg">شكرًا لاشتراكك في Clinic Management من AppMaker Egypt. تم استلام طلب الاشتراك. سيتم مراجعة بياناتك وتأكيد الدفع وتجهيز حسابك وموقعك الإلكتروني وإرسال بيانات الدخول خلال ساعتين من تأكيد الدفع واكتمال البيانات المطلوبة.</p>
+    <p class="sub-muted">رقم الطلب: <b id="done-id" dir="ltr"></b></p>
+    <p class="sub-muted" id="redirect-note">سيتم تحويلك إلى صفحة الدفع خلال ثوانٍ…</p>
+    <a id="pay-link" class="button" href="#">المتابعة إلى الدفع</a>
+  </div>
+</div>
+
+<script type="module" src="subscribe.js"></script>
+</body>
+</html>
