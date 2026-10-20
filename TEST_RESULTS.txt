@@ -1,0 +1,19 @@
+Logo size update - v2
+=====================
+Change: header + footer logo enlarged to 500% of its previous visible size.
+
+Files changed
+  index.html   - header and footer now load assets/logo.png (transparent cut-out)
+  styles.css   - logo sizes, taller nav bar, hero offset, mobile rule, dark-mode filter
+  assets/logo.png  - NEW: logo cut out from assets/logo.jpg, transparent background
+
+Measured in a real browser (Chromium)
+  desktop light  logo renders 180 x 70 px   (was ~36 x 14 px visible)  no console errors
+  desktop dark   logo renders 180 x 70 px   invert + hue-rotate keeps colours, no halo
+  mobile 390px   logo renders 150 x 58 px   nav fits, nothing cut off
+  footer         logo renders 180 x 70 px
+
+Checked: no overlap with nav links or buttons, no clipping, no white halo in either theme,
+letter holes (A, P, R) open and legible, no leftover background box.
+
+Not changed: any text, section, form, language switch, or booking behaviour.
