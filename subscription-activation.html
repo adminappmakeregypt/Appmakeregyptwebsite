@@ -1,0 +1,69 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Subscription Activation — AppMaker Egypt Admin</title>
+<meta name="robots" content="noindex,nofollow">
+<link rel="icon" href="favicon.png" type="image/png">
+<link rel="stylesheet" href="styles.css">
+<link rel="stylesheet" href="subscription.css">
+</head>
+<body>
+<header id="header"><nav class="container nav"><a href="index.html" class="logo"><img class="logo-mark" src="assets/logo.png" alt="AppMaker Egypt" width="180" height="70"></a><div class="nav-tools"><a href="promotions-admin.html" class="button outline" style="font-size:.85rem">Promotions</a> <a href="subscription-requests.html" class="button outline" style="font-size:.85rem">Subscription Requests</a></div></nav></header>
+<div class="adm-wrap">
+  <div id="login-view" class="card login-card" hidden>
+    <h1 style="font-size:1.3rem;margin-top:0">Subscription Activation</h1>
+    <p class="sub-muted">Authorized administrator only.</p>
+    <form id="login-form">
+      <label class="field"><span>Email</span><input type="email" id="login-email" required autocomplete="username"></label>
+      <label class="field"><span>Password</span><input type="password" id="login-password" required autocomplete="current-password"></label>
+      <button class="button" type="submit" style="width:100%">Sign in</button>
+      <p id="login-msg" class="msg error" role="alert"></p>
+    </form>
+  </div>
+
+  <div id="admin-view" hidden>
+    <div class="adm-head"><h1>Subscription Activation</h1><button id="signout-btn" class="button outline" type="button">Sign out</button></div>
+    <p class="sub-muted">One record per subscription request. Create the Clinic Management user and the doctor website yourself, then record the details here.</p>
+    <p id="admin-msg" class="msg" role="status"></p>
+    <div class="adm-filters"><label class="field"><span>Search</span><input id="q" placeholder="Doctor, clinic, request ID, email"></label></div>
+    <div class="adm-table-wrap">
+      <table class="adm">
+        <thead><tr><th>Doctor</th><th>Clinic</th><th>Request ID</th><th>Promotion</th><th>Payment</th><th>Start</th><th>End</th><th>Activation</th><th>Credentials sent</th></tr></thead>
+        <tbody id="rows"></tbody>
+      </table>
+    </div>
+  </div>
+</div>
+
+<div id="detail" class="adm-detail" hidden>
+  <div class="dialog">
+    <div class="adm-head"><h2 style="margin:0;font-size:1.2rem" id="a-title"></h2><button id="a-close" class="button outline" type="button">Close</button></div>
+    <div id="a-summary"></div>
+    <div id="a-setup" style="display:flex;flex-wrap:wrap;gap:8px;margin:6px 0 14px">
+      <button type="button" class="button outline" data-setup="accountSetupStatus">Mark clinic account setup completed</button>
+      <button type="button" class="button outline" data-setup="websiteSetupStatus">Mark website setup completed</button>
+    </div>
+    <form id="a-form">
+      <div class="sub-grid">
+        <label class="field"><span>Clinic Management user ID</span><input id="a-uid" maxlength="128" dir="ltr"></label>
+        <label class="field"><span>Login email</span><input id="a-email" type="email" maxlength="160" dir="ltr"></label>
+        <label class="field full"><span>Doctor website URL</span><input id="a-url" type="url" maxlength="500" dir="ltr" placeholder="https://"></label>
+        <label class="field"><span>Subscription start date</span><input id="a-start" type="date"></label>
+        <label class="field"><span>Subscription end date <small id="a-suggest" class="sub-muted"></small></span><input id="a-end" type="date"></label>
+        <label class="field"><span>Activation status</span>
+          <select id="a-status"><option value="pending">pending</option><option value="active">active</option><option value="suspended">suspended</option><option value="expired">expired</option></select>
+        </label>
+        <label class="field"><span>Credentials sent</span><select id="a-cred"><option value="false">No</option><option value="true">Yes</option></select></label>
+        <label class="field full"><span>Internal notes</span><textarea id="a-notes" maxlength="5000"></textarea></label>
+      </div>
+      <p id="a-req" class="sub-muted"></p>
+      <button class="button" type="submit">Save activation record</button>
+      <p id="a-msg" class="msg" role="status"></p>
+    </form>
+  </div>
+</div>
+<script type="module" src="subscription-activation.js"></script>
+</body>
+</html>
