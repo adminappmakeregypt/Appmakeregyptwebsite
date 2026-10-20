@@ -1,0 +1,8 @@
+Browser tests: PASS
+Desktop 1280x1800 and mobile 390x844; English and Arabic RTL; light/dark; image loading; 8 services, 6 portfolio cards, 3 pricing plans; testimonials next/dots; one-open FAQ; theme and cookie choice survive refresh; mobile menu opens and closes on navigation; back-to-top works; no mobile horizontal overflow; no browser JavaScript errors.
+
+Contact form: simulated Web3Forms success resets fields and shows confirmation; simulated failure keeps input and shows translated error. Payload fields checked. Real Web3Forms inbox delivery remains unverified; no real email was sent.
+
+Preserved original behavior: English resets on reload. Source marketing content is retained, not independently validated.
+
+Inspected screenshots: desktop home, Arabic dark pricing, Arabic dark contact/error state and map, mobile Arabic pricing and home.
