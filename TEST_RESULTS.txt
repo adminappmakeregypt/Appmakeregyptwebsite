@@ -1,0 +1,108 @@
+v4 — SUBSCRIPTION REQUESTS — TEST RESULTS (2026-10-20)
+
+A. Security rules — real Firebase emulator (Firestore + Storage), tests/rules.test.mjs: 43/43 passed
+   Public create valid request ✓ · cannot overwrite ✓ · cannot set payment confirmed / dates / credentialsSent ✓
+   tampered payment link rejected ✓ · draft or missing promotion rejected ✓ · missing name / bad specialty /
+   bad email / extra field (e.g. password) / no consent rejected ✓ · foreign photo path rejected ✓
+   public & other accounts cannot read, list or update requests ✓ · admin list/confirm ✓ · admin cannot alter
+   customer data or use invalid status ✓ · audit log admin-only ✓ · activation blocked before payment+setup ✓
+   pending record allowed ✓ · active allowed after confirm+setup ✓ · end before start rejected ✓
+   activation ID must equal request ID (no duplicates) ✓ · unknown request rejected ✓ · public cannot read
+   activations ✓ · existing promotions still public-readable ✓ · offer with price+duration saves ✓
+   Storage: public photo upload ✓ · no overwrite ✓ · no PDF ✓ · no >2 MB ✓ · only photo/logo names ✓
+   public cannot view photo ✓ · admin can view ✓
+
+B. Browser end-to-end (Chromium, real Firebase SDK against the emulator)
+   Offer button → subscribe.html?promo=<id> ✓ · correct title/price/duration shown ✓
+   Empty submit shows validation, no redirect ✓ · valid submit saves first, THEN redirects to the offer's exact
+   payment link ✓ · thank-you message + request ID shown ✓ · unknown offer → "not available" ✓
+   Save failure (offer unpublished mid-way) → error, NO redirect ✓ · triple submit → one request, one redirect ✓
+   Admin: login, list, search, payment filter, full detail with photo ✓ · form complete / confirm payment /
+   website + account completed / notes all saved, 5 history entries ✓
+   Activation: suggested end date from duration ✓ · saved as active with dates + credentials sent ✓
+   Mobile 390px form layout ✓ (fixed a hidden-field overflow found during testing) · no console errors ✓
+
+NOT VERIFIED (needs you)
+- Real Firebase project: publish the two v4 rule files first, then submit one real test request.
+- Real Paymob payment page (the test used a stand-in page).
+
+---- previous results ----
+TEST RESULTS — AppMaker Egypt website v3 (Promotions)
+Date: 2026-10-20
+
+Method: the site was served locally and exercised in a real Chromium browser (Playwright).
+Because the sandbox has no access to your Firebase password, Firebase was replaced by an
+in-memory simulation implementing the same API. Everything about the pages themselves
+(rendering, forms, validation, filtering, ordering, live updates, RTL, mobile layout)
+was genuinely exercised; the Firebase round-trip and the security rules themselves
+were NOT executed against the real service (see "Not verified" below).
+
+34/34 checks passed:
+
+Admin (Manage Promotions page)
+- Login form is shown; the management area is hidden before login and on direct navigation.
+- Signing in with a different account is rejected ("not authorized") and signed back out.
+- Signing in with appmakeregypt@gmail.com opens the management area; it stays open after refresh.
+- Create + Publish: promotion saved with photo stored under promotions/<document-id>/, createdBy
+  recorded, created/updated dates shown in the list.
+- Save Draft keeps the offer hidden from the public page.
+- Edit updates the SAME document (row count unchanged — no duplicates).
+- Publish/Unpublish toggle works from the list.
+- Delete asks for confirmation and removes the offer (and its photo).
+- Preview shows the exact card visitors will see.
+- Replacing a photo stores the new file and removes the old file from storage.
+
+Public homepage
+- The offers section is hidden when there is nothing to show.
+- It appears live (no page reload, no code change) when an offer is published.
+- Only Published offers within their start/end dates are shown; drafts, unpublished,
+  future and expired offers are hidden.
+- The payment button opens the exact configured payment URL with the configured button text.
+- Offers are sorted by display order.
+- Arabic titles/text render right-to-left; the section translates with the language toggle
+  (العروض / العروض الحالية) and the rest of the site is unchanged.
+- Mobile (390px): cards render and fit the screen.
+- No console or page errors in any test.
+
+Files changed vs v2
+- index.html  — added the "Current Offers" section (hidden until an offer is published),
+  a "Promotions" link in the desktop/mobile/footer navigation, and the promotions.js script tag.
+- app.js      — added "Promotions"/"العروض" and section title translations (English + Arabic).
+- styles.css  — added promotion card styling only; nothing existing was modified.
+- NEW promotions.js            — public live display of published offers.
+- NEW promotions-firebase.js   — shared setup reusing the clinic's Firebase project (bookmydoctor-6c93c).
+- NEW promotions-admin.html    — the Manage Promotions page.
+- NEW promotions-admin.js      — login gate + create/edit/preview/publish/unpublish/delete logic.
+- NEW firestore.rules          — your clinic's current rules PLUS the promotions block
+  (public reads of published offers only; all writes restricted to appmakeregypt@gmail.com).
+- NEW storage.rules            — your clinic's current rules PLUS the promotions block
+  (anyone can view offer photos; only appmakeregypt@gmail.com can upload/replace/delete;
+  JPG/PNG/WebP only, max 5 MB).
+- README.txt, TEST_RESULTS.txt — updated.
+
+Data structure (Firestore collection "promotions", one document per offer):
+title, imageUrl, imagePath, description, paymentUrl, buttonText,
+status (draft | published | unpublished), displayOrder,
+startDate, endDate, createdAt, updatedAt, createdBy.
+Photos live in Firebase Storage under promotions/<document-id>/photo.<ext>.
+
+Not verified (needs your live account):
+- Real sign-in with appmakeregypt@gmail.com against Firebase, and real reads/writes.
+- The security rules were written and brace-checked but NOT deployed or executed —
+  they take effect only after you paste them into the Firebase Console (README step 3).
+- Cross-browser behavior outside Chromium.
+
+Existing site checks from v2 remain valid (logo 180x70 desktop / 150x58 mobile in header and
+footer, dark-mode logo inversion, navigation fit, no console errors); the only v3 edits to those
+files are the additions listed above.
+
+
+===== v3.1 — Offers moved to the top of the homepage =====
+Change: the Current Offers section now renders as the FIRST section of the
+homepage (before the hero), so visitors see active offers immediately.
+Files changed: index.html (section moved), styles.css (top offset 162px /
+120px / 112px to clear the fixed header; hero gap reduced to 60px while
+offers are visible via :has()).
+Verified in a real browser (desktop 1280px + mobile 390px): offers visible
+under the header on load, hero follows cleanly, no console errors. Section
+stays hidden when no offers are published (hero layout unchanged).
